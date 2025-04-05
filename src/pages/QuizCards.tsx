@@ -444,7 +444,7 @@ const QuizCards = () => {
         
         // Get 3 random incorrect answers from other cards (definitions)
         const otherAnswers = [...shuffledReverseCards, ...shuffledNormalCards]
-          .filter((c, i) => c.id !== card.id)
+          .filter((c) => c.id !== card.id)
           .map(c => c.answer); // Get definitions
         
         const shuffledAnswers = otherAnswers
@@ -474,7 +474,7 @@ const QuizCards = () => {
         
         // Get 3 random incorrect answers from other cards (definitions)
         const otherAnswers = [...shuffledNormalCards, ...shuffledReverseCards]
-          .filter((c, i) => c.id !== card.id)
+          .filter((c) => c.id !== card.id)
           .map(c => c.answer); // Get definitions
         
         const shuffledAnswers = otherAnswers
@@ -503,29 +503,6 @@ const QuizCards = () => {
     setTestScore(0);
     setShowTestResults(false);
     setIsTestMode(true);
-  };
-
-  // Helper function to reformulate a definition without containing the key term
-  const reformulateDefinition = (keyTerm: string, definition: string): string => {
-    // Simple approach: remove the key term and any similar words from the definition
-    // and rephrase it to be a standalone definition
-    
-    // Create a regex pattern to match the key term and similar words
-    const keyTermWords = keyTerm.toLowerCase().split(/\s+/);
-    const keyTermPattern = new RegExp(keyTermWords.join('|'), 'gi');
-    
-    // Remove the key term from the definition
-    let reformulated = definition.replace(keyTermPattern, '');
-    
-    // Clean up any double spaces or punctuation issues
-    reformulated = reformulated.replace(/\s+/g, ' ').trim();
-    
-    // If the reformulated definition is too short, add some context
-    if (reformulated.length < 20) {
-      reformulated = `A concept that ${reformulated}`;
-    }
-    
-    return reformulated;
   };
 
   const handleAnswerSelect = (answer: string) => {

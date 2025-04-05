@@ -27,7 +27,6 @@ const UserMenu = () => {
   if (!user) return null;
 
   // Calculate XP progress to next level
-  const xpForNextLevel = user.level * 20;
   const xpForCurrentLevel = (user.level - 1) * 20;
   const xpProgress = user.xp - xpForCurrentLevel;
   const xpProgressPercentage = (xpProgress / 20) * 100;

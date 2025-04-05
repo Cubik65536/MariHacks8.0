@@ -9,11 +9,9 @@ import {
   Calendar, 
   CheckSquare, 
   FileText, 
-  GraduationCap, 
   Lightbulb, 
   MessageSquare, 
   Settings, 
-  Star, 
   Trophy, 
   Zap 
 } from 'lucide-react';
@@ -95,7 +93,7 @@ const Home: React.FC = () => {
     },
   ];
 
-  const xpForCurrentLevel = (user.level) * 20;
+  const xpForCurrentLevel = (user?.level || 1) * 20;
 
   return (
     <div className="min-h-screen bg-gray-50 p-4">

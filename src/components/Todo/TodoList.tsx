@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Trash2, Check, Calendar, Clock, ChevronDown } from 'lucide-react';
+import { Plus, Trash2, Check, Calendar, Clock } from 'lucide-react';
 import { useAuth } from '../../lib/AuthContext';
 import { storageService } from '../../lib/StorageService';
 

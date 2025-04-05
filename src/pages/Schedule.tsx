@@ -265,6 +265,7 @@ const Schedule: React.FC = () => {
             setSelectedEvent(undefined);
           }}
           onSave={handleSaveEvent}
+          onDelete={handleDeleteEvent}
           event={selectedEvent}
           mode={modalMode}
         />

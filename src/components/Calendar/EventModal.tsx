@@ -14,6 +14,7 @@ interface EventModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (event: Omit<CalendarEvent, 'id'>) => void;
+  onDelete?: () => void;
   event?: Partial<CalendarEvent>;
   mode: 'create' | 'edit';
 }
@@ -22,6 +23,7 @@ const EventModal: React.FC<EventModalProps> = ({
   isOpen,
   onClose,
   onSave,
+  onDelete,
   event,
   mode
 }) => {
@@ -183,6 +185,15 @@ const EventModal: React.FC<EventModalProps> = ({
           </div>
 
           <div className="mt-6 flex justify-end space-x-3">
+            {mode === 'edit' && onDelete && (
+              <button
+                type="button"
+                onClick={onDelete}
+                className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+              >
+                Delete
+              </button>
+            )}
             <button
               type="button"
               onClick={onClose}
