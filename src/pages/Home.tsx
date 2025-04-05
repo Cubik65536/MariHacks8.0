@@ -5,9 +5,11 @@ import { storageService } from '../lib/StorageService';
 import { CalendarEvent } from '../components/Calendar/EventModal';
 import { Todo } from '../components/Todo/TodoList';
 import { 
+  BookDashed,
   BookOpen, 
   Calendar, 
   CheckSquare, 
+  FileTerminal, 
   FileText, 
   Lightbulb, 
   MessageSquare, 
@@ -63,33 +65,33 @@ const Home: React.FC = () => {
   const features = [
     {
       title: 'Notes',
+      description: 'Chat with your study buddies',
+      icon: <MessageSquare className="w-6 h-6" />,
+      link: '/dashboard/notes',
+    },
+    {
+      title: 'Audio Notes',
       description: 'Create and organize your study notes',
       icon: <FileText className="w-6 h-6" />,
-      link: '/notes',
+      link: '/dashboard/audio-notes',
     },
     {
       title: 'Schedule',
       description: 'Manage your calendar and tasks',
       icon: <Calendar className="w-6 h-6" />,
-      link: '/schedule',
+      link: '/dashboard/schedule',
     },
     {
-      title: 'Flashcards',
+      title: 'Quiz Cards',
       description: 'Create and study with flashcards',
       icon: <Lightbulb className="w-6 h-6" />,
-      link: '/flashcards',
+      link: '/dashboard/quiz-cards',
     },
     {
-      title: 'Chat',
-      description: 'Chat with your study buddies',
-      icon: <MessageSquare className="w-6 h-6" />,
-      link: '/chat',
-    },
-    {
-      title: 'Settings',
+      title: 'Resources',
       description: 'Customize your experience',
-      icon: <Settings className="w-6 h-6" />,
-      link: '/settings',
+      icon: <BookDashed className="w-6 h-6" />,
+      link: '/dashboard/resources',
     },
   ];
 
