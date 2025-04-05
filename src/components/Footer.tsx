@@ -4,7 +4,7 @@ const Footer = () => {
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
-            <h3 className="text-xl font-bold mb-4">StudyBuddy</h3>
+            <h3 className="text-xl font-bold mb-4">StudyStack</h3>
             <p className="text-gray-300">
               Your all-in-one AI-powered studying companion
             </p>
@@ -22,14 +22,14 @@ const Footer = () => {
             <h3 className="text-xl font-bold mb-4">Contact</h3>
             <p className="text-gray-300">
               Have questions? Reach out to us at<br />
-              <a href="mailto:support@studybuddy.com" className="text-indigo-400 hover:text-indigo-300">
-                support@studybuddy.com
+              <a href="mailto:support@studystack.ixor.dev" className="text-indigo-400 hover:text-indigo-300">
+                support@studystack.ixor.dev
               </a>
             </p>
           </div>
         </div>
         <div className="border-t border-gray-700 mt-8 pt-8 text-center text-gray-300">
-          <p>&copy; {new Date().getFullYear()} StudyBuddy. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} StudyStack. All rights reserved.</p>
         </div>
       </div>
     </footer>

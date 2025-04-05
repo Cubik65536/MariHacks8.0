@@ -18,7 +18,7 @@ const Landing: React.FC = () => {
           </span>
         </h1>
         <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-          StudyBuddy automates task management, scheduling, and note organization so you can focus on what matters.
+          StudyStack automates task management, scheduling, and note organization so you can focus on what matters.
         </p>
         <div className="flex gap-4 justify-center mb-16">
           <Link
@@ -116,7 +116,7 @@ const Landing: React.FC = () => {
                 See how it works in action
               </h2>
               <p className="text-lg text-gray-600 mb-8">
-                Watch our demo to see how StudyBuddy can transform your learning experience and help you achieve better results.
+                Watch our demo to see how StudyStack can transform your learning experience and help you achieve better results.
               </p>
               <Link
                 to="/"
@@ -145,7 +145,7 @@ const Landing: React.FC = () => {
             Ready to transform your learning experience?
           </h2>
           <p className="text-lg text-gray-600 mb-8">
-            Join thousands of students who are already using StudyBuddy to learn more effectively.
+            Join thousands of students who are already using StudyStack to learn more effectively.
           </p>
           <Link
             to="/register"

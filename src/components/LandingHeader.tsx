@@ -10,7 +10,7 @@ const LandingHeader: React.FC = () => {
           {/* Logo and Brand */}
           <Link to="/" className="flex items-center space-x-2">
             <BookOpen className="w-8 h-8 text-purple-600" />
-            <span className="text-xl font-bold text-gray-900">StudyBuddy</span>
+            <span className="text-xl font-bold text-gray-900">StudyStack</span>
           </Link>
 
           {/* Auth Buttons */}
