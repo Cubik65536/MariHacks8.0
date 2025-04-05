@@ -9,11 +9,9 @@ import {
   BookOpen, 
   Calendar, 
   CheckSquare, 
-  FileTerminal, 
   FileText, 
   Lightbulb, 
   MessageSquare, 
-  Settings, 
   Trophy, 
   Zap 
 } from 'lucide-react';
