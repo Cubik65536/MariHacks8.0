@@ -22,6 +22,18 @@ interface CalendarEvent {
   updatedAt: string;
 }
 
+interface Todo {
+  id: string;
+  text: string;
+  completed: boolean;
+  dueDate?: string;
+  priority: 'low' | 'medium' | 'high';
+  category?: string;
+  userId: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 interface QuizCard {
   id: string;
   question: string;
@@ -38,6 +50,7 @@ interface StorageData {
   users: { [key: string]: { user: User; password: string } };
   notes: Note[];
   events: CalendarEvent[];
+  todos: Todo[];
   quizCards: { [key: string]: QuizCard[] };
 }
 
@@ -47,6 +60,7 @@ class StorageService {
     users: {},
     notes: [],
     events: [],
+    todos: [],
     quizCards: {},
   };
 
@@ -66,6 +80,7 @@ class StorageService {
       const usersData = localStorage.getItem('users');
       const notesData = localStorage.getItem('notes');
       const eventsData = localStorage.getItem('events');
+      const todosData = localStorage.getItem('todos');
       const quizCardsData = localStorage.getItem('quizCards');
 
       if (usersData) {
@@ -77,13 +92,16 @@ class StorageService {
       if (eventsData) {
         this.data.events = JSON.parse(eventsData);
       }
+      if (todosData) {
+        this.data.todos = JSON.parse(todosData);
+      }
       if (quizCardsData) {
         this.data.quizCards = JSON.parse(quizCardsData);
       }
     } catch (error) {
       console.error('Error loading data:', error);
       // Initialize with empty data if loading fails
-      this.data = { users: {}, notes: [], events: [], quizCards: {} };
+      this.data = { users: {}, notes: [], events: [], todos: [], quizCards: {} };
     }
   }
 
@@ -92,6 +110,7 @@ class StorageService {
       localStorage.setItem('users', JSON.stringify(this.data.users));
       localStorage.setItem('notes', JSON.stringify(this.data.notes));
       localStorage.setItem('events', JSON.stringify(this.data.events));
+      localStorage.setItem('todos', JSON.stringify(this.data.todos));
       localStorage.setItem('quizCards', JSON.stringify(this.data.quizCards));
     } catch (error) {
       console.error('Error saving data:', error);
@@ -277,6 +296,48 @@ class StorageService {
     this.data.quizCards[userId] = this.data.quizCards[userId].filter(card => card.id !== id);
     this.saveData();
     return this.data.quizCards[userId].length < initialLength;
+  }
+
+  // Todo methods
+  public getTodos(userId: string): Todo[] {
+    return this.data.todos.filter(todo => todo.userId === userId);
+  }
+
+  public getTodoById(id: string, userId: string): Todo | undefined {
+    return this.data.todos.find(todo => todo.id === id && todo.userId === userId);
+  }
+
+  public createTodo(todo: Omit<Todo, 'id' | 'createdAt' | 'updatedAt'>): Todo {
+    const newTodo: Todo = {
+      ...todo,
+      id: Date.now().toString(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    this.data.todos.push(newTodo);
+    this.saveData();
+    return newTodo;
+  }
+
+  public updateTodo(id: string, userId: string, updates: Partial<Todo>): Todo | undefined {
+    const todoIndex = this.data.todos.findIndex(todo => todo.id === id && todo.userId === userId);
+    if (todoIndex === -1) return undefined;
+
+    const updatedTodo = {
+      ...this.data.todos[todoIndex],
+      ...updates,
+      updatedAt: new Date().toISOString(),
+    };
+    this.data.todos[todoIndex] = updatedTodo;
+    this.saveData();
+    return updatedTodo;
+  }
+
+  public deleteTodo(id: string, userId: string): boolean {
+    const initialLength = this.data.todos.length;
+    this.data.todos = this.data.todos.filter(todo => !(todo.id === id && todo.userId === userId));
+    this.saveData();
+    return this.data.todos.length < initialLength;
   }
 }
 

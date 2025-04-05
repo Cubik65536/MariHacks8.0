@@ -1,17 +1,60 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import TodoList, { Todo } from '../components/Todo/TodoList';
 import EventModal, { CalendarEvent } from '../components/Calendar/EventModal';
+import { useAuth } from '../lib/AuthContext';
+import { storageService } from '../lib/StorageService';
+
+// Define interfaces that match the component expectations
+interface StorageTodo extends Omit<Todo, 'dueDate'> {
+  dueDate?: string;
+}
+
+interface StorageCalendarEvent extends Omit<CalendarEvent, 'start' | 'end'> {
+  startTime: string;
+  endTime: string;
+}
+
+// Helper function to convert StorageCalendarEvent to CalendarEvent
+const convertToCalendarEvent = (event: StorageCalendarEvent): CalendarEvent => {
+  return {
+    ...event,
+    start: new Date(event.startTime),
+    end: new Date(event.endTime),
+  };
+};
+
+// Helper function to convert StorageTodo to Todo
+const convertToTodo = (todo: StorageTodo): Todo => {
+  return {
+    ...todo,
+    dueDate: todo.dueDate ? new Date(todo.dueDate) : undefined,
+  };
+};
 
 const Schedule: React.FC = () => {
+  const { user } = useAuth();
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [todos, setTodos] = useState<Todo[]>([]);
   const [showEventModal, setShowEventModal] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<Partial<CalendarEvent> | undefined>();
   const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
+
+  // Load todos and events from StorageService on component mount
+  useEffect(() => {
+    if (user) {
+      // Load todos
+      const userTodos = storageService.getTodos(user.id);
+      setTodos(userTodos.map(convertToTodo));
+
+      // Load events
+      const userEvents = storageService.getEvents(user.id);
+      setEvents(userEvents.map(convertToCalendarEvent));
+    }
+  }, [user]);
 
   const handleDateSelect = (selectInfo: any) => {
     const calendarApi = selectInfo.view.calendar;
@@ -36,19 +79,47 @@ const Schedule: React.FC = () => {
   };
 
   const handleSaveEvent = (eventData: Omit<CalendarEvent, 'id'>) => {
+    if (!user) return;
+
     if (modalMode === 'create') {
-      setEvents([...events, { ...eventData, id: String(Date.now()) }]);
-    } else {
-      setEvents(events.map(event => 
-        event.id === selectedEvent?.id 
-          ? { ...eventData, id: event.id }
-          : event
-      ));
+      // Create a new event in StorageService
+      const newEvent = storageService.createEvent({
+        title: eventData.title,
+        description: eventData.description || '',
+        startTime: eventData.start.toISOString(),
+        endTime: eventData.end.toISOString(),
+        allDay: eventData.allDay || false,
+        color: '#3b82f6', // Default blue color
+        userId: user.id,
+      });
+
+      // Update local state
+      setEvents([...events, convertToCalendarEvent(newEvent)]);
+    } else if (selectedEvent?.id) {
+      // Update existing event in StorageService
+      const updatedEvent = storageService.updateEvent(selectedEvent.id, user.id, {
+        title: eventData.title,
+        description: eventData.description || '',
+        startTime: eventData.start.toISOString(),
+        endTime: eventData.end.toISOString(),
+        allDay: eventData.allDay || false,
+      });
+
+      if (updatedEvent) {
+        // Update local state
+        setEvents(events.map(event => 
+          event.id === selectedEvent.id ? convertToCalendarEvent(updatedEvent) : event
+        ));
+      }
     }
   };
 
   const handleDeleteEvent = () => {
-    if (selectedEvent?.id) {
+    if (!user || !selectedEvent?.id) return;
+
+    // Delete event from StorageService
+    if (storageService.deleteEvent(selectedEvent.id, user.id)) {
+      // Update local state
       setEvents(events.filter(event => event.id !== selectedEvent.id));
       setShowEventModal(false);
       setSelectedEvent(undefined);
@@ -56,48 +127,83 @@ const Schedule: React.FC = () => {
   };
 
   const handleAddTodo = (todo: Omit<Todo, 'id'>) => {
-    const newTodo = {
-      ...todo,
-      id: String(Date.now()),
-    };
+    if (!user) return;
 
-    // Add the todo to the list
-    setTodos([...todos, newTodo]);
+    // Create a new todo in StorageService
+    const newTodo = storageService.createTodo({
+      text: todo.text,
+      completed: false,
+      dueDate: todo.dueDate ? new Date(todo.dueDate).toISOString() : undefined,
+      priority: todo.priority,
+      category: todo.category,
+      userId: user.id,
+    });
+
+    // Update local state
+    setTodos([...todos, convertToTodo(newTodo)]);
 
     // If the todo has a due date, also add it as a calendar event
     if (todo.dueDate) {
       const endDate = new Date(todo.dueDate);
       endDate.setHours(23, 59, 59);
 
-      setEvents([...events, {
-        id: `todo-${newTodo.id}`,
+      // Create a new event in StorageService
+      const newEvent = storageService.createEvent({
         title: `📋 ${todo.text}`,
-        start: todo.dueDate,
-        end: endDate,
-        allDay: true,
         description: `Priority: ${todo.priority}\nCategory: ${todo.category}`,
-      }]);
+        startTime: new Date(todo.dueDate).toISOString(),
+        endTime: endDate.toISOString(),
+        allDay: true,
+        color: '#3b82f6', // Default blue color
+        userId: user.id,
+      });
+
+      // Update local state
+      setEvents([...events, convertToCalendarEvent(newEvent)]);
     }
   };
 
   const handleToggleTodo = (id: string) => {
-    setTodos(todos.map(todo => {
-      if (todo.id === id) {
-        // If the todo is being marked as completed, remove its calendar event
-        if (!todo.completed && todo.dueDate) {
-          setEvents(events.filter(event => event.id !== `todo-${id}`));
+    if (!user) return;
+
+    const todo = todos.find(t => t.id === id);
+    if (!todo) return;
+
+    // Update todo in StorageService
+    const updatedTodo = storageService.updateTodo(id, user.id, {
+      completed: !todo.completed,
+    });
+
+    if (updatedTodo) {
+      // Update local state
+      setTodos(todos.map(t => 
+        t.id === id ? convertToTodo(updatedTodo) : t
+      ));
+
+      // If the todo is being marked as completed and has a due date, remove its calendar event
+      if (!todo.completed && todo.dueDate) {
+        const eventId = `todo-${id}`;
+        if (storageService.deleteEvent(eventId, user.id)) {
+          setEvents(events.filter(event => event.id !== eventId));
         }
-        return { ...todo, completed: !todo.completed };
       }
-      return todo;
-    }));
+    }
   };
 
   const handleDeleteTodo = (id: string) => {
-    // Remove the todo
-    setTodos(todos.filter(todo => todo.id !== id));
-    // Remove the corresponding calendar event if it exists
-    setEvents(events.filter(event => event.id !== `todo-${id}`));
+    if (!user) return;
+
+    // Delete todo from StorageService
+    if (storageService.deleteTodo(id, user.id)) {
+      // Update local state
+      setTodos(todos.filter(todo => todo.id !== id));
+
+      // Remove the corresponding calendar event if it exists
+      const eventId = `todo-${id}`;
+      if (storageService.deleteEvent(eventId, user.id)) {
+        setEvents(events.filter(event => event.id !== eventId));
+      }
+    }
   };
 
   return (
