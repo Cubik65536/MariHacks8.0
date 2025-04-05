@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Plus, Trash2, Check, Calendar, Clock, ChevronDown } from 'lucide-react';
+import { useAuth } from '../../lib/AuthContext';
+import { storageService } from '../../lib/StorageService';
 
 export interface Todo {
   id: string;
@@ -36,6 +38,7 @@ const TodoList: React.FC<TodoListProps> = ({
   onToggleTodo,
   onDeleteTodo,
 }) => {
+  const { user, updateUser } = useAuth();
   const [newTodoText, setNewTodoText] = useState('');
   const [newTodoDueDate, setNewTodoDueDate] = useState('');
   const [newTodoPriority, setNewTodoPriority] = useState<Todo['priority']>('medium');
@@ -58,6 +61,29 @@ const TodoList: React.FC<TodoListProps> = ({
     setNewTodoDueDate('');
     setNewTodoPriority('medium');
     setShowAddForm(false);
+  };
+
+  const handleToggleTodo = (id: string) => {
+    const todo = todos.find(t => t.id === id);
+    if (todo && !todo.completed && user) {
+      // Award 1 XP for completing a task and update streak
+      const result = storageService.addXP(user.id, 1);
+      if (result.leveledUp) {
+        alert(`Congratulations! You've reached level ${result.level}!`);
+      }
+      if (result.streakUpdated) {
+        alert(`Great job! Your streak is now ${result.level} days! 🔥`);
+      }
+      // Update the user object in the AuthContext
+      updateUser({
+        xp: result.xp,
+        level: result.level,
+        currentStreak: user.currentStreak,
+        lastActivityDate: user.lastActivityDate,
+        longestStreak: user.longestStreak
+      });
+    }
+    onToggleTodo(id);
   };
 
   const getPriorityColor = (priority: Todo['priority']) => {
@@ -159,7 +185,7 @@ const TodoList: React.FC<TodoListProps> = ({
             className="p-4 hover:bg-gray-50 transition-colors flex items-start gap-3 group"
           >
             <button
-              onClick={() => onToggleTodo(todo.id)}
+              onClick={() => handleToggleTodo(todo.id)}
               className={`flex-shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${
                 todo.completed
                   ? 'bg-green-500 border-green-500'

@@ -112,6 +112,62 @@ class StorageService {
     return this.data.users;
   }
 
+  public addXP = (userId: string, amount: number): { xp: number; level: number; leveledUp: boolean; streakUpdated: boolean } => {
+    const userData = Object.values(this.data.users).find(u => u.user.id === userId);
+    if (!userData) throw new Error('User not found');
+
+    const currentXP = userData.user.xp;
+    const currentLevel = userData.user.level;
+    const newXP = currentXP + amount;
+    
+    // Calculate new level (1 level per 20 XP)
+    const newLevel = Math.floor(newXP / 20) + 1;
+    const leveledUp = newLevel > currentLevel;
+
+    // Update streak
+    const streakUpdated = this.updateStreak(userData.user);
+
+    // Update user data
+    userData.user.xp = newXP;
+    userData.user.level = newLevel;
+    this.saveData();
+
+    return {
+      xp: newXP,
+      level: newLevel,
+      leveledUp,
+      streakUpdated
+    };
+  };
+
+  private updateStreak(user: User): boolean {
+    const today = new Date();
+    const lastActivity = new Date(user.lastActivityDate);
+    
+    // Reset time part for date comparison
+    today.setHours(0, 0, 0, 0);
+    lastActivity.setHours(0, 0, 0, 0);
+    
+    const diffDays = Math.floor((today.getTime() - lastActivity.getTime()) / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 0) {
+      // Already updated today
+      return false;
+    } else if (diffDays === 1) {
+      // Next day, increment streak
+      user.currentStreak += 1;
+      if (user.currentStreak > user.longestStreak) {
+        user.longestStreak = user.currentStreak;
+      }
+    } else {
+      // Streak broken
+      user.currentStreak = 1;
+    }
+    
+    user.lastActivityDate = new Date().toISOString();
+    return true;
+  }
+
   // Note methods
   public getNotes(userId: string): Note[] {
     return this.data.notes.filter(note => note.userId === userId);

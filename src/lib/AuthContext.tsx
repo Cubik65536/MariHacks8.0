@@ -6,6 +6,11 @@ export interface User {
   username: string;
   email: string;
   createdAt: string;
+  xp: number;
+  level: number;
+  currentStreak: number;
+  lastActivityDate: string;
+  longestStreak: number;
 }
 
 interface AuthContextType {
@@ -62,6 +67,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       username,
       email,
       createdAt: new Date().toISOString(),
+      xp: 0,
+      level: 1,
+      currentStreak: 0,
+      lastActivityDate: new Date().toISOString(),
+      longestStreak: 0,
     };
 
     storageService.saveUser(email, {

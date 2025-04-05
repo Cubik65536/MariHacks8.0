@@ -15,19 +15,83 @@ const Resources = () => {
   const [resources] = useState<Resource[]>([
     {
       id: 1,
-      title: "Introduction to React",
-      type: "video",
-      url: "https://example.com/react-intro",
-      description: "A comprehensive introduction to React fundamentals",
-      tags: ["react", "javascript", "frontend"]
+      title: "Khan Academy",
+      type: "website",
+      url: "https://www.khanacademy.org",
+      description: "Free online courses, lessons, and practice in math, science, and more",
+      tags: ["education", "math", "science", "free"]
     },
     {
       id: 2,
-      title: "Advanced Mathematics",
+      title: "Coursera",
+      type: "website",
+      url: "https://www.coursera.org",
+      description: "Online learning platform offering courses from top universities",
+      tags: ["courses", "university", "certification"]
+    },
+    {
+      id: 3,
+      title: "The Feynman Lectures on Physics",
       type: "book",
-      url: "https://example.com/math-book",
-      description: "Complete guide to advanced mathematics concepts",
-      tags: ["mathematics", "calculus", "algebra"]
+      url: "https://www.feynmanlectures.caltech.edu",
+      description: "Classic physics lectures by Nobel laureate Richard Feynman",
+      tags: ["physics", "science", "lectures"]
+    },
+    {
+      id: 4,
+      title: "3Blue1Brown",
+      type: "video",
+      url: "https://www.youtube.com/c/3blue1brown",
+      description: "Animated math videos that make complex concepts intuitive",
+      tags: ["mathematics", "visualization", "education"]
+    },
+    {
+      id: 5,
+      title: "MIT OpenCourseWare",
+      type: "website",
+      url: "https://ocw.mit.edu",
+      description: "Free MIT course materials for self-study",
+      tags: ["university", "courses", "free", "stem"]
+    },
+    {
+      id: 6,
+      title: "Codecademy",
+      type: "website",
+      url: "https://www.codecademy.com",
+      description: "Interactive coding lessons and projects",
+      tags: ["programming", "coding", "interactive"]
+    },
+    {
+      id: 7,
+      title: "Scientific American",
+      type: "article",
+      url: "https://www.scientificamerican.com",
+      description: "Latest scientific discoveries and research articles",
+      tags: ["science", "research", "news"]
+    },
+    {
+      id: 8,
+      title: "Project Gutenberg",
+      type: "website",
+      url: "https://www.gutenberg.org",
+      description: "Free eBooks of public domain literature",
+      tags: ["books", "literature", "free"]
+    },
+    {
+      id: 9,
+      title: "TED-Ed",
+      type: "video",
+      url: "https://ed.ted.com",
+      description: "Educational videos on various topics",
+      tags: ["education", "videos", "lectures"]
+    },
+    {
+      id: 10,
+      title: "Wolfram Alpha",
+      type: "website",
+      url: "https://www.wolframalpha.com",
+      description: "Computational knowledge engine for math and science",
+      tags: ["mathematics", "science", "computation"]
     }
   ]);
 

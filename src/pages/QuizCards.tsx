@@ -33,7 +33,7 @@ interface TestQuestion {
 }
 
 const QuizCards = () => {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const [notes, setNotes] = useState<Note[]>([]);
   const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
   const [quizCards, setQuizCards] = useState<QuizCard[]>([]);
@@ -551,6 +551,22 @@ const QuizCards = () => {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
       setSelectedAnswer(null);
     } else {
+      // Award XP based on the final score
+      if (user) {
+        const xpEarned = Math.floor((testScore / testQuestions.length) * 10); // Max 10 XP for a perfect score
+        const result = storageService.addXP(user.id, xpEarned);
+        
+        if (result.leveledUp) {
+          // Show level up notification
+          alert(`Congratulations! You've reached level ${result.level}!`);
+        }
+        
+        // Update the user object in the AuthContext
+        updateUser({
+          xp: result.xp,
+          level: result.level
+        });
+      }
       setShowTestResults(true);
     }
   };
